@@ -6,34 +6,29 @@ import * as deeplClient from './deepl.mjs';
 import * as utils from './utils.mjs';
 import * as cli from './cli.mjs';
 
-console.log("Debugging Step 6: Directly log Notion API Token:", process.env.NOTION_API_TOKEN);
+async function handleNotionOperations(options) {
+  const notionApiToken = process.env.NOTION_API_TOKEN;
+  const fullOptions = { ...options, notionApiToken };
 
-async function main() {
-  const options = cli.getOptions();
-  console.log("Debugging Step 1: Options Object:", options);
-  console.log("Debugging Step 2: Environment Variables:", process.env);
-  console.log("Debugging Step 3: Command Line Arguments:", process.argv);
+  // Keep this debug line to check the token before making the API call
+  console.log("Debugging: Notion API Token before API call:", notionApiToken);
 
-  console.log("Debugging Step 7: Before validateToken");
-  await notionClient.validateToken(options);
-  console.log("Debugging Step 7: After validateToken");
+  await notionClient.validateToken(fullOptions);
 
-  console.log("Debugging Step 8: DeepL API Token:", process.env.DEEPL_API_TOKEN);
-
-  const originalPage = await notionClient.fetchPage(options.url);
-  console.log("Debugging Step 9: Original Page:", originalPage);
-
+  const originalPage = await notionClient.getOriginalPage(options.url);
   const translatedBlocks = await notionClient.translatePage(originalPage, options.from, options.to);
-  console.log("Debugging Step 9: Translated Blocks:", translatedBlocks);
 
   await notionClient.createTranslatedPage(originalPage, translatedBlocks, options.to);
 }
 
-console.log(utils.toPrettifiedJSON({ key: "value" }));
-console.log("Notion API Token:", process.env.NOTION_API_TOKEN);
+async function main() {
+  const options = cli.getOptions();
+  await handleNotionOperations(options);
+}
 
 main().catch(err => {
-  console.error("Debugging Step 5: Error Caught", err);
-  console.error("Debugging Step 10: Error Stack:", err.stack);
+  console.error("Error Caught:", err);
+  console.error("Error Stack:", err.stack);
   process.exit(1);
 });
+

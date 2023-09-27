@@ -14,15 +14,14 @@ console.log("Notion API Token from Env:", process.env.NOTION_API_TOKEN);
 
 // Function to validate the Notion API token
 export async function validateToken(options) {
-  const token = options.notionApiToken;  // Use the token passed in options
-  
-  if (!token) {
+  const { notionApiToken } = options;
+  if (!notionApiToken) {
     throw new Error("Notion API token is missing.");
   }
 
   // Token Format Validation
-  if (token.length < 40 || token.length > 60) {
-    throw new Error("Invalid DeepL API token length.");
+  if (notionApiToken.length < 40 || notionApiToken.length > 60) {
+    throw new Error("Invalid Notion API token length.");
   }
 
   // Additional validation logic can be added here

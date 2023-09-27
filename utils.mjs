@@ -1,5 +1,18 @@
-// utils.mjs
-import * as utils from './utils.mjs';
+// Extracts the page ID from a Notion URL
+export function extractPageId(url) {
+  try {
+    const regex = /([a-f0-9]{32})/;
+    const match = url.match(regex);
+    if (match) {
+      return match[1];
+    } else {
+      throw new Error("No page ID found in the URL.");
+    }
+  } catch (error) {
+    console.error("Failed to extract page ID:", error);
+    throw new Error("Failed to extract page ID.");
+  }
+}
 
 // Prettify JSON object for better readability
 export function toPrettifiedJSON(obj) {
