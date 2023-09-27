@@ -1,0 +1,34 @@
+The original code is a Node.js script that serves as a CLI tool for translating Notion pages using the DeepL API. It performs several tasks:
+
+Environment Setup: It loads environment variables from a .env file and checks for the presence of required API tokens for Notion and DeepL.
+
+API Clients Initialization: It initializes the Notion and DeepL API clients.
+
+Language Support: It defines supported languages for translation.
+
+Utility Functions: It includes utility functions for JSON prettification and property removal.
+
+CLI Setup: It uses the commander library to set up CLI options and arguments.
+
+Main Logic: The main function (buildTranslatedBlocks) recursively fetches and translates blocks of text from a Notion page. It also handles special cases like unsupported blocks, file blocks, and child pages.
+
+Page Creation: It creates a new Notion page with the translated content.
+
+Execution: An immediately invoked async function ((async function () {...})()) orchestrates the entire process.
+
+Notable Points:
+Error Handling: The script has robust error handling, including checking for missing API tokens and unsupported languages.
+
+Pagination: It handles pagination for fetching blocks from Notion.
+
+Deep Copy: It uses JSON.parse(JSON.stringify(obj)) for deep copying objects, which is not the most efficient or safest method but works for this use case.
+
+Rate Limiting: The script doesn't seem to handle API rate limits, which could be an issue for large Notion pages or frequent translations.
+
+Nested Blocks: The script handles nested blocks up to two levels deep in a single request, as per Notion API limitations.
+
+Special Blocks: It has special handling for 'file', 'table', 'image', 'child_page', and 'child_database' block types.
+
+Debugging: It includes optional debug logging.
+
+The script is well-structured and modular, making it easier to understand and extend. However, it could benefit from further modularization, especially the large buildTranslatedBlocks function.
