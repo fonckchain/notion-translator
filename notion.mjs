@@ -1,4 +1,6 @@
 // Import required modules from Notion SDK, DeepL, and utility file
+import dotenv from 'dotenv';
+dotenv.config();
 import { Client, LogLevel } from '@notionhq/client';
 import * as deepl from './deepl.mjs';
 import * as utils from './utils.mjs';
@@ -10,7 +12,6 @@ const notion = new Client({
 });
 
 console.log("Notion API Token from Env:", process.env.NOTION_API_TOKEN);
-
 
 // Function to validate the Notion API token
 export async function validateToken(options) {
@@ -29,6 +30,9 @@ export async function validateToken(options) {
 
 // Function to fetch the original Notion page using its URL
 export async function getOriginalPage(url) {
+  // Debug log to print the URL
+  console.log("Debugging: URL passed to getOriginalPage:", url);
+
   try {
     // Extract the page ID from the URL using utility function
     const pageId = utils.extractPageId(url);
