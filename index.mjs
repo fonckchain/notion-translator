@@ -1,3 +1,4 @@
+// index.mjs
 import dotenv from 'dotenv';
 dotenv.config();
 console.log("Debugging: dotenv.config() called");  // Debugging log 1

@@ -1,40 +1,37 @@
-// Import required modules from Notion SDK, DeepL, and utility file
+// notion.mjs
+import { Client, LogLevel } from "@notionhq/client";
 import dotenv from 'dotenv';
-dotenv.config();
-import { Client, LogLevel } from '@notionhq/client';
 import * as deepl from './deepl.mjs';
 import * as utils from './utils.mjs';
 
-// Initialize the Notion client with API token and log level
+dotenv.config();
+
 const notion = new Client({
   auth: process.env.NOTION_API_TOKEN,
   logLevel: LogLevel.ERROR,
 });
 
-// Function to validate the Notion API token
 export async function validateToken(options) {
   const { notionApiToken } = options;
   if (!notionApiToken) {
     throw new Error("Notion API token is missing.");
   }
-  // Additional validation logic can be added here
 }
 
-// Function to fetch the original Notion page using its URL
 export async function getOriginalPage(url) {
-  try {
-    const pageId = utils.extractPageId(url);
-    const response = await notion.pages.retrieve({ page_id: pageId });
-    return response;
-  } catch (error) {
-    console.error("Detailed Error in getOriginalPage:", error.message, error.stack);
-    throw new Error(`Failed to retrieve original page. Original Error: ${error.message}`);
-  }
+  const pageId = utils.extractPageId(url);
+  const response = await notion.pages.retrieve({ page_id: pageId });
+  return response;
 }
 
-// Function to create a new Notion page with translated content
 export async function createTranslatedPage(originalPage, translatedBlocks, to) {
   try {
+    if (!originalPage || !originalPage.title || originalPage.title.length === 0) {
+      throw new Error("Invalid originalPage data");
+    }
+
+    console.log("Debugging: Original Page:", JSON.stringify(originalPage, null, 2));
+
     const newPage = await notion.pages.create({
       parent: { database_id: originalPage.parent.database_id },
       properties: originalPage.properties,
@@ -55,52 +52,52 @@ export async function createTranslatedPage(originalPage, translatedBlocks, to) {
   }
 }
 
-// Function to recursively fetch and translate blocks from a Notion page
 export async function buildTranslatedBlocks(id, nestedDepth, from, to) {
-  try {
-    const blocks = await notion.blocks.children.list({
-      block_id: id,
-      page_size: 50
-    });
-    const translatedBlocks = [];
+  const blocks = await notion.blocks.children.list({
+    block_id: id,
+    page_size: 50
+  });
+  const translatedBlocks = [];
 
-    for (const block of blocks.results) {
-      if (nestedDepth < 2) {
-        const nestedTranslatedBlocks = await buildTranslatedBlocks(block.id, nestedDepth + 1, from, to);
-        translatedBlocks.push({
-          ...block,
-          children: nestedTranslatedBlocks
-        });
-      }
-
-      if (block.paragraph && block.paragraph.text) {
-        const translatedText = await deepl.translateText(block.paragraph.text, from, to);
-        translatedBlocks.push({
-          ...block,
-          paragraph: {
-            text: translatedText
-          }
-        });
-      } else {
-        translatedBlocks.push(block);
-      }
+  for (const block of blocks.results) {
+    if (nestedDepth < 2) {
+      const nestedTranslatedBlocks = await buildTranslatedBlocks(block.id, nestedDepth + 1, from, to);
+      translatedBlocks.push({
+        ...block,
+        children: nestedTranslatedBlocks
+      });
     }
-    return translatedBlocks;
-  } catch (error) {
-    console.error("Detailed Error in buildTranslatedBlocks:", error.message, error.stack);
-    throw new Error(`Failed to build translated blocks. Original Error: ${error.message}`);
+
+    if (block.paragraph && block.paragraph.text) {
+      const translatedText = await deepl.translateText(block.paragraph.text, from, to);
+      translatedBlocks.push({
+        ...block,
+        paragraph: {
+          text: translatedText
+        }
+      });
+    } else {
+      translatedBlocks.push(block);
+    }
   }
+  return translatedBlocks;
 }
 
-// Function to append the translated blocks to the new Notion page
 async function appendTranslatedBlocks(newPageId, translatedBlocks) {
+  await notion.blocks.children.append({
+    block_id: newPageId,
+    children: translatedBlocks
+  });
+}
+
+// Function moved from notionDeepIntegration.mjs
+export async function fetchNotionData(pageId) {
   try {
-    await notion.blocks.children.append({
-      block_id: newPageId,
-      children: translatedBlocks
-    });
+    const notionResponse = await notion.pages.retrieve({ page_id: pageId });
+    console.log("Successfully connected to Notion API.");
+    return notionResponse;
   } catch (error) {
-    console.error("Detailed Error in appendTranslatedBlocks:", error.message, error.stack);
-    throw new Error(`Failed to append translated blocks. Original Error: ${error.message}`);
+    console.error(`Failed to connect to Notion API. Status code: ${error.code}`);
+    throw error;
   }
 }

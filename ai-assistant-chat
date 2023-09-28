@@ -32,3 +32,9 @@ Special Blocks: It has special handling for 'file', 'table', 'image', 'child_pag
 Debugging: It includes optional debug logging.
 
 The script is well-structured and modular, making it easier to understand and extend. However, it could benefit from further modularization, especially the large buildTranslatedBlocks function.
+
+notion-translator --from en --to es --url https://fonck.notion.site/Build-A-Personal-Voice-Assistant-for-Telegram-Using-Python-and-ChatGPT-4396ec3d903949c18a3c278cd4329c16?pvs=4
+
+node index.mjs --from en --to es --url https://fonck.notion.site/Build-A-Personal-Voice-Assistant-for-Telegram-Using-Python-and-ChatGPT-dc02f31bc5f44ac480e20c0a58da2d28?pvs=4
+
+dc02f31b-c5f4-4ac4-80e2-0c0a58da2d28

@@ -27,10 +27,11 @@
   "author": "Kazuhiro Sera",
   "license": "MIT",
   "dependencies": {
-    "@notionhq/client": "^2.2.4",
+    "@notionhq/client": "^2.2.13",
+    "axios": "^1.5.1",
     "commander": "^10.0.1",
-    "deepl-node": "^1.9.0",
-    "dotenv": "^16.0.3",
+    "deepl-node": "^1.10.2",
+    "dotenv": "^16.3.1",
     "notion-translator": "^0.0.6",
     "open": "^9.1.0"
   }
